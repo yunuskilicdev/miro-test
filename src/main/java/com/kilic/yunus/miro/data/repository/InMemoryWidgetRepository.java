@@ -40,7 +40,7 @@ public class InMemoryWidgetRepository implements WidgetRepository {
         widget.setLastModificationDate(LocalDateTime.now());
         int index = widgetList.indexOf(widget);
         if (index < 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
+            return null;
         }
         shiftExistingWidgets(widget.getZindex());
         widgetList.add(widget);

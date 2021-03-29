@@ -21,6 +21,8 @@ import java.util.stream.Collectors;
 @Service
 public class WidgetService {
 
+    private static final String WIDGET_NOT_FOUND = "WIDGET_NOT_FOUND";
+
     private final WidgetMapper widgetMapper;
 
     private final WidgetRepository widgetRepository;
@@ -38,20 +40,24 @@ public class WidgetService {
 
     public synchronized WidgetResource updateWidget(WidgetDto dto) {
         Widget widget = widgetMapper.toModel(dto);
-        return widgetMapper.toResource(widgetRepository.updateWidget(widget));
+        Widget updateWidget = widgetRepository.updateWidget(widget);
+        if (updateWidget == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, WIDGET_NOT_FOUND);
+        }
+        return widgetMapper.toResource(updateWidget);
     }
 
     public synchronized void deleteWidget(Long id) {
         boolean success = widgetRepository.deleteWidget(id);
         if (!success) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, WIDGET_NOT_FOUND);
         }
     }
 
     public synchronized WidgetResource getById(Long id) {
         Optional<Widget> optionalWidget = widgetRepository.getById(id);
         if (optionalWidget.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, WIDGET_NOT_FOUND);
         }
         return widgetMapper.toResource(optionalWidget.get());
     }
